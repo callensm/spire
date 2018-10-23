@@ -1,0 +1,40 @@
+{
+  "name": "spire",
+  "version": "1.0.0",
+  "private": true,
+  "author": {
+    "name": "Matthew Callens",
+    "email": "callensmatt@gmail.com"
+  },
+  "scripts": {
+    "dev": "next",
+    "build": "next build",
+    "start": "next start",
+    "type-check": "tsc"
+  },
+  "dependencies": {
+    "@zeit/next-less": "^1.0.1",
+    "@zeit/next-typescript": "^1.1.1",
+    "antd": "^3.10.2",
+    "axios": "^0.18.0",
+    "dotenv": "^6.1.0",
+    "next": "^7.0.2",
+    "react": "^16.5.2",
+    "react-dom": "^16.5.2",
+    "react-syntax-highlighter": "^9.0.1",
+    "styled-components": "^4.0.2"
+  },
+  "devDependencies": {
+    "@types/axios": "^0.14.0",
+    "@types/dotenv": "^4.0.3",
+    "@types/next": "^7.0.1",
+    "@types/react": "^16.4.16",
+    "@types/react-dom": "16.0.8",
+    "@types/react-syntax-highlighter": "0.0.7",
+    "@types/styled-components": "^4.0.1",
+    "babel-plugin-import": "^1.10.0",
+    "babel-plugin-styled-components": "^1.8.0",
+    "less": "^3.8.1",
+    "typescript": "3.1.1"
+  }
+}
