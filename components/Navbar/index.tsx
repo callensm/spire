@@ -1,19 +1,8 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { Layout, Button, Modal, Avatar, Dropdown, Menu } from 'antd'
-import axios from 'axios'
+import GitHubAPI from '../../lib/githubApi'
 import CreateSnippetModal from './CreateSnippetModal'
-
-// async function getGistIDList(username: string): Promise<string[]> {
-//   const res = await axios.get(`https://api.github.com/users/${username}/gists`)
-//   return res.data.map(item => item.id)
-// }
-
-async function getGistDetails(id: string): Promise<any> {
-  const res = await axios.get(`https://api.github.com/gists/${id}`)
-  const { files } = res.data
-  return Object.keys(files).map(k => files[k])
-}
 
 const { Header } = Layout
 
@@ -68,9 +57,9 @@ class Navbar extends React.Component<INavbarProps, INavbarState> {
 
     this.setState({ modal: true, modalLoading: true })
 
-    // const ids: string[] = await getGistIDList(this.props.user.login)
-    const details = ['7621795'].map(i => getGistDetails(i)) // ids.map(i => getGistDetails(i))
-    await Promise.all(details).then(value => this.setState({ gists: value[0] }))
+    const ids: string[] = await GitHubAPI.getGistIDs(this.props.user.login)
+    const details = ids.map(i => GitHubAPI.getGistDetails(i)) // ids.map(i => getGistDetails(i))
+    await Promise.all(details).then(value => this.setState({ gists: value }))
     this.setState({ modalLoading: false })
   }
 
@@ -104,7 +93,6 @@ class Navbar extends React.Component<INavbarProps, INavbarState> {
         </SubMenu>
         <CreateSnippetModal
           visible={this.state.modal}
-          numerOfCards={this.props.user.public_gists}
           gists={this.state.gists}
           loading={this.state.modalLoading}
           onClose={this.closeModal}

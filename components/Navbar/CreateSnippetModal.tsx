@@ -1,8 +1,8 @@
 import * as React from 'react'
-import { Modal, Card, Skeleton, Steps, Icon, Input } from 'antd'
+import { Modal, Card, Skeleton, Steps, Icon } from 'antd'
 import styled from 'styled-components'
-// import SyntaxHighlighter from 'react-syntax-highlighter'
-// import { githubGist } from 'react-syntax-highlighter/styles/hljs'
+import SyntaxHighlighter from 'react-syntax-highlighter'
+import { githubGist } from 'react-syntax-highlighter/styles/hljs'
 
 const ModalContainer = styled.div`
   display: flex;
@@ -18,6 +18,7 @@ const ModalContent = styled.div`
 
 const SourceChoiceCard = styled.div`
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
 
@@ -39,32 +40,27 @@ const SourceChoiceCard = styled.div`
     background-color: rgba(0, 0, 0, 0.02);
     transition: all 0.3s ease;
   }
+
+  span:first-child {
+    margin: 10px 0;
+  }
 `
 
-// {this.props.loading
-//   ? this.renderLoadingCards()
-//   : this.props.gists.map((g, i) => (
-//       <Card
-//         key={i}
-//         style={{
-//           maxHeight: '15em',
-//           overflow: 'scroll',
-//           boxShadow: '0px 1px 3px 2px rgba(0, 0, 0, 0.15)'
-//         }}
-//       >
-//         <SyntaxHighlighter
-//           showLineNumbers
-//           style={githubGist}
-//           customStyle={{ fontSize: '0.75em' }}
-//         >
-//           {g.content}
-//         </SyntaxHighlighter>
-//       </Card>
-//     ))}
+const SourceCardMeta = styled.p`
+  text-align: center;
+  margin-top: 1em;
+  font-size: 0.6em;
+  font-style: italic;
+  color: rgba(0, 0, 0, 0.2);
+  margin: 0 7px;
+`
+
+const Code = styled(SyntaxHighlighter)`
+  font-size: 0.75em;
+`
 
 interface ICreateSnippetModalProps {
   visible: boolean
-  numerOfCards: number
   gists: any[]
   loading: boolean
   onClose: () => void
@@ -86,6 +82,10 @@ class CreateSnippetModal extends React.Component<
     currentStep: 0
   }
 
+  componentDidUpdate() {
+    console.log(this.props)
+  }
+
   chooseSource = (source: 'gist' | 'repo') => {
     this.setState({ source, currentStep: 1 })
   }
@@ -97,7 +97,7 @@ class CreateSnippetModal extends React.Component<
 
   renderLoadingCards = (): React.ReactNode[] => {
     const cards = []
-    for (let i = 0; i < this.props.numerOfCards; i++)
+    for (let i = 0; i < this.props.gists.length; i++)
       cards.push(
         <Card style={{ width: '20em' }}>
           <Skeleton active />
@@ -128,15 +128,29 @@ class CreateSnippetModal extends React.Component<
           <ModalContent>
             {this.state.source && this.state.currentStep ? (
               this.state.source === 'gist' ? (
-                <Input placeholder="Paste your public Gist URL" />
+                <div>
+                  {this.props.loading
+                    ? this.renderLoadingCards()
+                    : this.props.gists.map((g, i) => (
+                        <div key={i}>
+                          <Code showLineNumbers style={githubGist} lanugage="elixir">
+                            {g.files['test.ex'].content}
+                          </Code>
+                        </div>
+                      ))}
+                </div>
               ) : (
                 <div />
               )
             ) : (
               <>
-                <SourceChoiceCard onClick={() => this.chooseSource('gist')}>Gist</SourceChoiceCard>
+                <SourceChoiceCard onClick={() => this.chooseSource('gist')}>
+                  <span>Gist</span>
+                  <SourceCardMeta>(Only Gists with 1 file will be available)</SourceCardMeta>
+                </SourceChoiceCard>
                 <SourceChoiceCard onClick={() => this.chooseSource('repo')}>
-                  Repository
+                  <span>Repository</span>
+                  <SourceCardMeta>(Provide start and end lines for specific file)</SourceCardMeta>
                 </SourceChoiceCard>
               </>
             )}
