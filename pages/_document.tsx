@@ -1,7 +1,19 @@
 import * as React from 'react'
-import Document, { Head, Main, NextScript } from 'next/document'
+import Document, { Head, Main, NextScript, DocumentProps } from 'next/document'
+import { ServerStyleSheet } from 'styled-components'
 
-class SpireDocument extends Document<{ styleTags: any }> {
+interface ISpireDocumentProps extends DocumentProps {
+  styleTags: any[]
+}
+
+class SpireDocument extends Document<ISpireDocumentProps> {
+  static getInitialProps({ renderPage }) {
+    const sheet = new ServerStyleSheet()
+    const page = renderPage(App => props => sheet.collectStyles(<App {...props} />))
+    const styleTags = sheet.getStyleElement()
+    return { ...page, styleTags }
+  }
+
   render() {
     return (
       <html lang="en">
@@ -10,6 +22,7 @@ class SpireDocument extends Document<{ styleTags: any }> {
           <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
           <meta httpEquiv="X-UA-Compatible" content="ie=edge" />
           <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Fira+Mono|Nunito" />
+          {this.props.styleTags}
         </Head>
         <body>
           <Main />
