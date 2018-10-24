@@ -5,10 +5,10 @@ import SyntaxHighlighter from 'react-syntax-highlighter'
 import { githubGist } from 'react-syntax-highlighter/styles/hljs'
 import axios from 'axios'
 
-async function getGistIDList(username: string): Promise<string[]> {
-  const res = await axios.get(`https://api.github.com/users/${username}/gists`)
-  return res.data.map(item => item.id)
-}
+// async function getGistIDList(username: string): Promise<string[]> {
+//   const res = await axios.get(`https://api.github.com/users/${username}/gists`)
+//   return res.data.map(item => item.id)
+// }
 
 async function getGistDetails(id: string): Promise<any> {
   const res = await axios.get(`https://api.github.com/gists/${id}`)

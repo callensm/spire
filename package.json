@@ -7,9 +7,9 @@
     "email": "callensmatt@gmail.com"
   },
   "scripts": {
-    "dev": "next",
-    "build": "next build",
-    "start": "next start",
+    "dev": "nodemon server/index.ts",
+    "build": "next build && tsc --project tsconfig.server.json",
+    "start": "NODE_ENV=production node .next/production-server/index.js",
     "type-check": "tsc"
   },
   "dependencies": {
@@ -17,7 +17,12 @@
     "@zeit/next-typescript": "^1.1.1",
     "antd": "^3.10.2",
     "axios": "^0.18.0",
+    "compression": "^1.7.3",
+    "cookie-parser": "^1.4.3",
     "dotenv": "^6.1.0",
+    "express": "^4.16.4",
+    "helmet": "^3.14.0",
+    "mongoose": "^5.3.6",
     "next": "^7.0.2",
     "react": "^16.5.2",
     "react-dom": "^16.5.2",
@@ -26,7 +31,12 @@
   },
   "devDependencies": {
     "@types/axios": "^0.14.0",
+    "@types/compression": "0.0.36",
+    "@types/cookie-parser": "^1.4.1",
     "@types/dotenv": "^4.0.3",
+    "@types/express": "^4.16.0",
+    "@types/helmet": "0.0.42",
+    "@types/mongoose": "^5.2.19",
     "@types/next": "^7.0.1",
     "@types/react": "^16.4.16",
     "@types/react-dom": "16.0.8",
@@ -35,6 +45,8 @@
     "babel-plugin-import": "^1.10.0",
     "babel-plugin-styled-components": "^1.8.0",
     "less": "^3.8.1",
+    "nodemon": "^1.18.4",
+    "ts-node": "^7.0.1",
     "typescript": "3.1.1"
   }
 }

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import Document, { Head, Main, NextScript } from 'next/document'
 
-class SpireDocument extends Document {
+class SpireDocument extends Document<{ styleTags: any }> {
   render() {
     return (
       <html lang="en">
