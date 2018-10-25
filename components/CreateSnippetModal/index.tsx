@@ -3,6 +3,7 @@ import { Modal } from 'antd'
 import styled from 'styled-components'
 import SyntaxHighlighter from 'react-syntax-highlighter'
 import { githubGist } from 'react-syntax-highlighter/styles/hljs'
+import GitHubAPI from '../../lib/githubApi'
 import StepTracker from './StepTracker'
 import SourceCardList from './SourceCardList'
 import SkeletonCards from './SkeletonCards'
@@ -22,8 +23,7 @@ const Code = styled(SyntaxHighlighter)`
 
 interface ICreateSnippetModalProps {
   visible: boolean
-  gists: any[]
-  loading: boolean
+  gistIDs: string[]
   onClose: () => void
 }
 
@@ -31,6 +31,8 @@ interface ICreateSnippetModalState {
   disableSubmit: boolean
   source: 'gist' | 'repo' | null
   currentStep: number
+  gists: any[]
+  loading: boolean
 }
 
 class CreateSnippetModal extends React.PureComponent<
@@ -40,20 +42,31 @@ class CreateSnippetModal extends React.PureComponent<
   state = {
     disableSubmit: true,
     source: null,
-    currentStep: 0
+    currentStep: 0,
+    gists: [],
+    loading: false
   }
 
   componentDidUpdate() {
     console.log(this.props)
   }
 
-  chooseSource = (source: 'gist' | 'repo') => {
-    this.setState({ source, currentStep: 1 })
+  chooseSource = async (source: 'gist' | 'repo') => {
+    this.setState({ source, currentStep: 1, loading: true })
+
+    if (source === 'gist') {
+      const details = this.props.gistIDs.map(i => GitHubAPI.getGistDetails(i))
+      await Promise.all(details).then(value => this.setState({ gists: value, loading: false }))
+    } else {
+      // TODO: build out repository submission flow
+    }
   }
 
   onCancel = () => {
-    this.setState({ disableSubmit: true, source: null, currentStep: 0 })
-    this.props.onClose()
+    this.setState(
+      { disableSubmit: true, source: null, currentStep: 0, loading: false, gists: [] },
+      () => this.props.onClose()
+    )
   }
 
   render() {
@@ -76,10 +89,10 @@ class CreateSnippetModal extends React.PureComponent<
             {this.state.source && this.state.currentStep ? (
               this.state.source === 'gist' ? (
                 <div>
-                  {this.props.loading ? (
-                    <SkeletonCards amount={this.props.gists.length} width="20em" />
+                  {this.state.loading ? (
+                    <SkeletonCards amount={this.props.gistIDs.length} width="20em" />
                   ) : (
-                    this.props.gists.map((g, i) => (
+                    this.state.gists.map((g, i) => (
                       <div key={i}>
                         <Code showLineNumbers style={githubGist} lanugage="elixir">
                           {g.files['test.ex'].content}
@@ -93,7 +106,7 @@ class CreateSnippetModal extends React.PureComponent<
               )
             ) : (
               <SourceCardList
-                sources={[
+                sourceOptions={[
                   {
                     id: 'gist',
                     title: 'Gist',

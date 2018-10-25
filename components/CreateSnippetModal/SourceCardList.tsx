@@ -20,7 +20,7 @@ const SourceCard: React.SFC<ISourceCardProps> = props => (
 interface ISourceCardListProps {
   gutter: number
   span: number
-  sources: {
+  sourceOptions: {
     id: string
     title: string
     description: string
@@ -30,7 +30,7 @@ interface ISourceCardListProps {
 
 const SourceCardList: React.SFC<ISourceCardListProps> = props => (
   <Row type="flex" justify="center" gutter={props.gutter}>
-    {props.sources.map((s, i) => (
+    {props.sourceOptions.map((s, i) => (
       <SourceCard
         key={`${s.id}-${i}`}
         span={props.span}

@@ -30,8 +30,7 @@ const SubMenu = styled.section`
 
 interface INavbarState {
   modal: boolean
-  modalLoading: boolean
-  gists: any[]
+  gistIDs: string[]
 }
 
 interface INavbarProps {
@@ -41,8 +40,7 @@ interface INavbarProps {
 class Navbar extends React.Component<INavbarProps, INavbarState> {
   state = {
     modal: false,
-    modalLoading: false,
-    gists: []
+    gistIDs: []
   }
 
   openModal = async () => {
@@ -54,13 +52,9 @@ class Navbar extends React.Component<INavbarProps, INavbarState> {
       return
     }
 
-    this.setState({ modal: true, modalLoading: true })
-
+    this.setState({ modal: true })
     const ids: string[] = await GitHubAPI.getGistIDs(this.props.user.login)
-    const details = ids.map(i => GitHubAPI.getGistDetails(i))
-    await Promise.all(details).then(value => this.setState({ gists: value }))
-
-    this.setState({ modalLoading: false })
+    this.setState({ gistIDs: ids })
   }
 
   closeModal = () => this.setState({ modal: false })
@@ -81,8 +75,7 @@ class Navbar extends React.Component<INavbarProps, INavbarState> {
         </SubMenu>
         <CreateSnippetModal
           visible={this.state.modal}
-          gists={this.state.gists}
-          loading={this.state.modalLoading}
+          gistIDs={this.state.gistIDs}
           onClose={this.closeModal}
         />
       </Bar>

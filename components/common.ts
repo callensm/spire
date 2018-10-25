@@ -15,6 +15,7 @@ export const Meta = styled(AntCard.Meta)`
 `
 
 export const Card = styled(AntCard)`
+  cursor: pointer;
   border-radius: 4px;
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
 `
