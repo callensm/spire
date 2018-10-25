@@ -13,6 +13,7 @@
     "type-check": "tsc"
   },
   "dependencies": {
+    "@zeit/next-css": "^1.0.1",
     "@zeit/next-less": "^1.0.1",
     "@zeit/next-typescript": "^1.1.1",
     "antd": "^3.10.2",
@@ -24,6 +25,7 @@
     "helmet": "^3.14.0",
     "mongoose": "^5.3.6",
     "next": "^7.0.2",
+    "nprogress": "^0.2.0",
     "react": "^16.5.2",
     "react-dom": "^16.5.2",
     "react-syntax-highlighter": "^9.0.1",
@@ -38,6 +40,7 @@
     "@types/helmet": "0.0.42",
     "@types/mongoose": "^5.2.19",
     "@types/next": "^7.0.1",
+    "@types/nprogress": "0.0.29",
     "@types/react": "^16.4.16",
     "@types/react-dom": "16.0.8",
     "@types/react-syntax-highlighter": "0.0.7",

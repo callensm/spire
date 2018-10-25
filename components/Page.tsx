@@ -1,6 +1,9 @@
 import * as React from 'react'
 import Head from 'next/head'
+import Router from 'next/router'
 import styled from 'styled-components'
+import NProgress from 'nprogress'
+import 'nprogress/nprogress.css'
 
 const BodyWrapper = styled.div`
   background-color: rgb(245, 245, 245);
@@ -12,13 +15,23 @@ interface IPageProps {
   children: React.ReactNode
 }
 
-const Page: React.SFC<IPageProps> = ({ children, title = 'Spire' }) => (
-  <BodyWrapper>
-    <Head>
-      <title>{title}</title>
-    </Head>
-    {children}
-  </BodyWrapper>
-)
+class Page extends React.PureComponent<IPageProps> {
+  componentDidMount() {
+    Router.onRouteChangeStart = () => NProgress.start()
+    Router.onRouteChangeComplete = () => NProgress.done()
+    Router.onRouteChangeError = () => NProgress.done()
+  }
+
+  render() {
+    return (
+      <BodyWrapper>
+        <Head>
+          <title>{this.props.title || 'Spire'}</title>
+        </Head>
+        {this.props.children}
+      </BodyWrapper>
+    )
+  }
+}
 
 export default Page

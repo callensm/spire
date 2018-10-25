@@ -22,6 +22,13 @@ class SpireDocument extends Document<ISpireDocumentProps> {
           <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
           <meta httpEquiv="X-UA-Compatible" content="ie=edge" />
           <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Fira+Mono|Nunito" />
+          <style>
+            {`
+            #nprogress .bar {
+              background: #ff876c;
+            }
+            `}
+          </style>
           {this.props.styleTags}
         </Head>
         <body>
