@@ -17,6 +17,7 @@ interface IPageProps {
 
 class Page extends React.PureComponent<IPageProps> {
   componentDidMount() {
+    NProgress.configure({ showSpinner: false })
     Router.onRouteChangeStart = () => NProgress.start()
     Router.onRouteChangeComplete = () => NProgress.done()
     Router.onRouteChangeError = () => NProgress.done()

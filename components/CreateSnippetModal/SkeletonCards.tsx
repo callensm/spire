@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Skeleton } from 'antd'
-import { Card } from '../common'
+import Card from '../Common/Card'
 
 interface ISkeletonCardsProps {
   amount: number

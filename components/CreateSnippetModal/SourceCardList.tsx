@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Row, Col } from 'antd'
-import { Card, Meta } from '../common'
+import Card, { Meta } from '../Common/Card'
 
 interface ISourceCardProps {
   title: string
@@ -11,7 +11,7 @@ interface ISourceCardProps {
 
 const SourceCard: React.SFC<ISourceCardProps> = props => (
   <Col span={props.span}>
-    <Card onClick={props.onClick}>
+    <Card onClick={props.onClick} hoverable>
       <Meta title={props.title} description={props.description} />
     </Card>
   </Col>

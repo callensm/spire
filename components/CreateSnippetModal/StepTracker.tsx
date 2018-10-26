@@ -7,8 +7,9 @@ interface IStepTrackerProps {
 
 const StepTracker: React.SFC<IStepTrackerProps> = ({ current }) => (
   <Steps current={current}>
-    <Steps.Step key="source" title="Choose Source" icon={<Icon type="github" />} />
-    <Steps.Step key="input" title="Paste URL" icon={<Icon type="link" />} />
+    <Steps.Step key="origin" title="Origin" icon={<Icon type="github" />} />
+    <Steps.Step key="source" title="Source" icon={<Icon type="link" />} />
+    <Steps.Step key="tag" title="Tag" icon={<Icon type="tags" />} />
   </Steps>
 )
 

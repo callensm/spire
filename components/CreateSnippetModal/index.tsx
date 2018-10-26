@@ -1,12 +1,11 @@
 import * as React from 'react'
 import { Modal } from 'antd'
 import styled from 'styled-components'
-import SyntaxHighlighter from 'react-syntax-highlighter'
-import { githubGist } from 'react-syntax-highlighter/styles/hljs'
 import GitHubAPI from '../../lib/githubApi'
 import StepTracker from './StepTracker'
 import SourceCardList from './SourceCardList'
 import SkeletonCards from './SkeletonCards'
+import GistPreview from './GistPreview'
 
 const ModalContainer = styled.div`
   display: flex;
@@ -15,10 +14,6 @@ const ModalContainer = styled.div`
 
 const ModalContent = styled.div`
   margin-top: 2em;
-`
-
-const Code = styled(SyntaxHighlighter)`
-  font-size: 0.75em;
 `
 
 interface ICreateSnippetModalProps {
@@ -47,26 +42,24 @@ class CreateSnippetModal extends React.PureComponent<
     loading: false
   }
 
-  componentDidUpdate() {
-    console.log(this.props)
-  }
-
   chooseSource = async (source: 'gist' | 'repo') => {
     this.setState({ source, currentStep: 1, loading: true })
 
     if (source === 'gist') {
       const details = this.props.gistIDs.map(i => GitHubAPI.getGistDetails(i))
-      await Promise.all(details).then(value => this.setState({ gists: value, loading: false }))
+      const gists = await Promise.all(details)
+      const availableGists = gists
+        .filter(g => Object.keys(g.files).length === 1)
+        .map(g => ({ ...Object.values(g.files)[0], id: g.id }))
+      this.setState({ gists: availableGists, loading: false })
     } else {
       // TODO: build out repository submission flow
     }
   }
 
   onCancel = () => {
-    this.setState(
-      { disableSubmit: true, source: null, currentStep: 0, loading: false, gists: [] },
-      () => this.props.onClose()
-    )
+    this.props.onClose()
+    this.setState({ disableSubmit: true, source: null, currentStep: 0, loading: false, gists: [] })
   }
 
   render() {
@@ -92,13 +85,7 @@ class CreateSnippetModal extends React.PureComponent<
                   {this.state.loading ? (
                     <SkeletonCards amount={this.props.gistIDs.length} width="20em" />
                   ) : (
-                    this.state.gists.map((g, i) => (
-                      <div key={i}>
-                        <Code showLineNumbers style={githubGist} lanugage="elixir">
-                          {g.files['test.ex'].content}
-                        </Code>
-                      </div>
-                    ))
+                    this.state.gists.map(g => <GistPreview key={g.id} file={g} />)
                   )}
                 </div>
               ) : (

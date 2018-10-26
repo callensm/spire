@@ -2,7 +2,7 @@ import axios from 'axios'
 
 interface IGistDetails {
   id: string
-  numberofFiles: number
+  numberOfFiles: number
   files: {
     [name: string]: {
       filename: string
@@ -25,7 +25,7 @@ class GitHubAPI {
     const { data } = await axios.get(this.route(`/gists/${id}`))
     return {
       id: data.id,
-      numberofFiles: Object.keys(data.files).length,
+      numberOfFiles: Object.keys(data.files).length,
       files: data.files,
       public: data.public,
       html_url: data.html_url
