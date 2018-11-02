@@ -6,7 +6,7 @@ import StepTracker from './StepTracker'
 import SourceCardList from './SourceCardList'
 import SkeletonCards from './SkeletonCards'
 import { GistPreviewList } from './GistPreview'
-import TagAssignment from './TagAssignment'
+import DescriptionInput from './DescriptionInput'
 
 const ModalContainer = styled.div`
   display: flex;
@@ -70,6 +70,10 @@ class CreateSnippetModal extends React.PureComponent<
     this.setState({ selected: gist, currentStep: 2 })
   }
 
+  enableSubmit = () => {
+    this.setState({ disableSubmit: false })
+  }
+
   renderStep = (step: number): React.ReactNode => {
     switch (step) {
       case 0: {
@@ -107,7 +111,7 @@ class CreateSnippetModal extends React.PureComponent<
       }
 
       case 2: {
-        return <TagAssignment initial={[this.state.selected.language]} />
+        return <DescriptionInput onHasContent={this.enableSubmit} />
       }
     }
   }
