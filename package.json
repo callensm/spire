@@ -10,7 +10,8 @@
     "dev": "nodemon server/index.ts",
     "build": "next build && tsc --project tsconfig.server.json",
     "start": "NODE_ENV=production node .next/production-server/index.js",
-    "type-check": "tsc"
+    "db": "mongod --dbpath ./data/db",
+    "tsc": "tsc"
   },
   "dependencies": {
     "@zeit/next-css": "^1.0.1",

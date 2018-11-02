@@ -16,7 +16,7 @@ const user = {
 class IndexPage extends React.Component {
   render() {
     return (
-      <Page title="Spire | Home">
+      <Page title="Spire - Home">
         <Layout>
           <Navbar user={user} />
           <Content>

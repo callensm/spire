@@ -5,7 +5,8 @@ import GitHubAPI from '../../lib/githubApi'
 import StepTracker from './StepTracker'
 import SourceCardList from './SourceCardList'
 import SkeletonCards from './SkeletonCards'
-import GistPreview from './GistPreview'
+import { GistPreviewList } from './GistPreview'
+import TagAssignment from './TagAssignment'
 
 const ModalContainer = styled.div`
   display: flex;
@@ -14,6 +15,7 @@ const ModalContainer = styled.div`
 
 const ModalContent = styled.div`
   margin-top: 2em;
+  width: 100%;
 `
 
 interface ICreateSnippetModalProps {
@@ -28,6 +30,7 @@ interface ICreateSnippetModalState {
   currentStep: number
   gists: any[]
   loading: boolean
+  selected: any
 }
 
 class CreateSnippetModal extends React.PureComponent<
@@ -39,7 +42,8 @@ class CreateSnippetModal extends React.PureComponent<
     source: null,
     currentStep: 0,
     gists: [],
-    loading: false
+    loading: false,
+    selected: null
   }
 
   chooseSource = async (source: 'gist' | 'repo') => {
@@ -62,10 +66,55 @@ class CreateSnippetModal extends React.PureComponent<
     this.setState({ disableSubmit: true, source: null, currentStep: 0, loading: false, gists: [] })
   }
 
+  handleSelectGist = gist => {
+    this.setState({ selected: gist, currentStep: 2 })
+  }
+
+  renderStep = (step: number): React.ReactNode => {
+    switch (step) {
+      case 0: {
+        return (
+          <SourceCardList
+            sourceOptions={[
+              {
+                id: 'gist',
+                title: 'Gist',
+                description: '(Only Gists with 1 file will be available)'
+              },
+              {
+                id: 'repo',
+                title: 'Repository',
+                description: '(Provide start and end lines for specific file)'
+              }
+            ]}
+            gutter={16}
+            span={12}
+            onSourceClick={this.chooseSource}
+          />
+        )
+      }
+
+      case 1: {
+        return this.state.loading ? (
+          <SkeletonCards amount={this.props.gistIDs.length} width="35em" />
+        ) : (
+          <GistPreviewList
+            gists={this.state.gists}
+            loading={this.state.loading}
+            onSelect={this.handleSelectGist}
+          />
+        )
+      }
+
+      case 2: {
+        return <TagAssignment initial={[this.state.selected.language]} />
+      }
+    }
+  }
+
   render() {
     return (
       <Modal
-        centered
         title="Create a New Snippet"
         visible={this.props.visible}
         okText="Create"
@@ -78,39 +127,7 @@ class CreateSnippetModal extends React.PureComponent<
       >
         <ModalContainer>
           <StepTracker current={this.state.currentStep} />
-          <ModalContent>
-            {this.state.source && this.state.currentStep ? (
-              this.state.source === 'gist' ? (
-                <div>
-                  {this.state.loading ? (
-                    <SkeletonCards amount={this.props.gistIDs.length} width="20em" />
-                  ) : (
-                    this.state.gists.map(g => <GistPreview key={g.id} file={g} />)
-                  )}
-                </div>
-              ) : (
-                <div />
-              )
-            ) : (
-              <SourceCardList
-                sourceOptions={[
-                  {
-                    id: 'gist',
-                    title: 'Gist',
-                    description: '(Only Gists with 1 file will be available)'
-                  },
-                  {
-                    id: 'repo',
-                    title: 'Repository',
-                    description: '(Provide start and end lines for specific file)'
-                  }
-                ]}
-                gutter={16}
-                span={12}
-                onSourceClick={this.chooseSource}
-              />
-            )}
-          </ModalContent>
+          <ModalContent>{this.renderStep(this.state.currentStep)}</ModalContent>
         </ModalContainer>
       </Modal>
     )
