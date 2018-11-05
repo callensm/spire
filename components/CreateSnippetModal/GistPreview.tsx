@@ -35,6 +35,7 @@ interface IGistPreviewListProps {
 
 export const GistPreviewList: React.SFC<IGistPreviewListProps> = ({ gists, loading, onSelect }) => (
   <>
+    <h3>Available Gists</h3>
     {gists.map(g => (
       <GistPreview
         key={g.id}

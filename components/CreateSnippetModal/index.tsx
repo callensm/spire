@@ -1,12 +1,13 @@
 import * as React from 'react'
 import { Modal } from 'antd'
 import styled from 'styled-components'
-import GitHubAPI from '../../lib/githubApi'
+import GitHubAPI, { IRepoDetails, IGistDetails } from '../../lib/githubApi'
 import StepTracker from './StepTracker'
 import SourceCardList from './SourceCardList'
 import SkeletonCards from './SkeletonCards'
 import { GistPreviewList } from './GistPreview'
-import DescriptionInput from './DescriptionInput'
+import { RepoPreviewList } from './RepoPreview'
+import CreationSettings from './CreationSettings'
 
 const ModalContainer = styled.div`
   display: flex;
@@ -20,7 +21,9 @@ const ModalContent = styled.div`
 
 interface ICreateSnippetModalProps {
   visible: boolean
+  username: string
   gistIDs: string[]
+  repos: IRepoDetails[]
   onClose: () => void
 }
 
@@ -48,16 +51,15 @@ class CreateSnippetModal extends React.PureComponent<
 
   chooseSource = async (source: 'gist' | 'repo') => {
     this.setState({ source, currentStep: 1, loading: true })
+    const { gistIDs } = this.props
 
     if (source === 'gist') {
-      const details = this.props.gistIDs.map(i => GitHubAPI.getGistDetails(i))
-      const gists = await Promise.all(details)
+      const details: Promise<IGistDetails>[] = gistIDs.map(i => GitHubAPI.getGistDetails(i))
+      const gists: IGistDetails[] = await Promise.all(details)
       const availableGists = gists
         .filter(g => Object.keys(g.files).length === 1)
         .map(g => ({ ...Object.values(g.files)[0], id: g.id }))
       this.setState({ gists: availableGists, loading: false })
-    } else {
-      // TODO: build out repository submission flow
     }
   }
 
@@ -72,6 +74,10 @@ class CreateSnippetModal extends React.PureComponent<
 
   handleSelectGist = gist => {
     this.setState({ selected: gist, currentStep: 2 })
+  }
+
+  handleSelectRepo = repo => {
+    this.setState({ selected: repo, currentStep: 2 })
   }
 
   enableSubmit = () => {
@@ -103,19 +109,30 @@ class CreateSnippetModal extends React.PureComponent<
       }
 
       case 1: {
-        return this.state.loading ? (
-          <SkeletonCards amount={this.props.gistIDs.length} width="35em" />
-        ) : (
-          <GistPreviewList
-            gists={this.state.gists}
-            loading={this.state.loading}
-            onSelect={this.handleSelectGist}
-          />
-        )
+        if (this.state.source === 'gist') {
+          return this.state.loading ? (
+            <SkeletonCards amount={this.props.gistIDs.length} width="35em" />
+          ) : (
+            <GistPreviewList
+              gists={this.state.gists}
+              loading={this.state.loading}
+              onSelect={this.handleSelectGist}
+            />
+          )
+        } else {
+          return <RepoPreviewList repos={this.props.repos} onSelect={this.handleSelectRepo} />
+        }
       }
 
       case 2: {
-        return <DescriptionInput onHasContent={this.enableSubmit} />
+        return (
+          <CreationSettings
+            username={this.props.username}
+            repoName={this.state.selected.name}
+            source={this.state.source}
+            onHasContent={this.enableSubmit}
+          />
+        )
       }
     }
   }

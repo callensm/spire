@@ -8,8 +8,8 @@ interface IStepTrackerProps {
 const StepTracker: React.SFC<IStepTrackerProps> = ({ current }) => (
   <Steps current={current}>
     <Steps.Step key="origin" title="Origin" icon={<Icon type="github" />} />
-    <Steps.Step key="source" title="Source" icon={<Icon type="link" />} />
-    <Steps.Step key="describe" title="Describe" icon={<Icon type="edit" />} />
+    <Steps.Step key="source" title="Source" icon={<Icon type="file-text" />} />
+    <Steps.Step key="settings" title="Settings" icon={<Icon type="setting" />} />
   </Steps>
 )
 

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { Layout, Button, Modal } from 'antd'
-import GitHubAPI from '../../lib/githubApi'
+import GitHubAPI, { IRepoDetails } from '../../lib/githubApi'
 import AvatarMenu from './AvatarMenu'
 import CreateSnippetModal from '../CreateSnippetModal'
 
@@ -31,6 +31,7 @@ const SubMenu = styled.section`
 interface INavbarState {
   modal: boolean
   gistIDs: string[]
+  repos: IRepoDetails[]
 }
 
 interface INavbarProps {
@@ -40,7 +41,8 @@ interface INavbarProps {
 class Navbar extends React.Component<INavbarProps, INavbarState> {
   state = {
     modal: false,
-    gistIDs: []
+    gistIDs: [],
+    repos: []
   }
 
   openModal = async () => {
@@ -53,8 +55,9 @@ class Navbar extends React.Component<INavbarProps, INavbarState> {
     }
 
     this.setState({ modal: true })
-    const ids: string[] = await GitHubAPI.getGistIDs(this.props.user.login)
-    this.setState({ gistIDs: ids })
+    const gistIDs: string[] = await GitHubAPI.getGistIDs(this.props.user.login)
+    const repos: IRepoDetails[] = await GitHubAPI.getRepos(this.props.user.login)
+    this.setState({ gistIDs, repos })
   }
 
   closeModal = () => this.setState({ modal: false })
@@ -74,8 +77,10 @@ class Navbar extends React.Component<INavbarProps, INavbarState> {
           )}
         </SubMenu>
         <CreateSnippetModal
+          username={this.props.user.login}
           visible={this.state.modal}
           gistIDs={this.state.gistIDs}
+          repos={this.state.repos}
           onClose={this.closeModal}
         />
       </Bar>
