@@ -66,6 +66,10 @@ class CreateSnippetModal extends React.PureComponent<
     this.setState({ disableSubmit: true, source: null, currentStep: 0, loading: false, gists: [] })
   }
 
+  handleSubmit = () => {
+    alert('submit')
+  }
+
   handleSelectGist = gist => {
     this.setState({ selected: gist, currentStep: 2 })
   }
@@ -126,7 +130,7 @@ class CreateSnippetModal extends React.PureComponent<
         destroyOnClose={true}
         closable={false}
         onCancel={this.onCancel}
-        onOk={() => alert('submit')}
+        onOk={this.handleSubmit}
         okButtonProps={{ disabled: this.state.disableSubmit }}
       >
         <ModalContainer>

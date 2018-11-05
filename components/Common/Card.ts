@@ -18,7 +18,6 @@ export const Meta = styled(AntCard.Meta)`
 
   & > * > *:last-child {
     font-size: 0.8em;
-    font-style: italic;
   }
 `
 
