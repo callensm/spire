@@ -5,13 +5,14 @@ import { githubGist } from 'react-syntax-highlighter/styles/hljs'
 
 interface ICodeProps {
   language: string
+  startingLineNumber?: number
+  full?: boolean
   children: string
 }
 
 const StyledHighlighter = styled(SyntaxHighlighter)`
   font-size: 0.8em;
-  max-height: 15.05em;
-  overflow: scroll;
+  ${(props: { full?: boolean }) => !props.full && 'max-height: 15.05em; overflow: scroll;'};
   border-radius: 4px;
   border: 1px solid rgba(255, 158, 125, 0.2);
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
@@ -26,8 +27,14 @@ const StyledHighlighter = styled(SyntaxHighlighter)`
   }
 `
 
-const Code: React.SFC<ICodeProps> = ({ children, language }) => (
-  <StyledHighlighter style={githubGist} language={language} showLineNumbers>
+const Code: React.SFC<ICodeProps> = ({ children, language, startingLineNumber, full }) => (
+  <StyledHighlighter
+    style={githubGist}
+    startingLineNumber={startingLineNumber}
+    language={language}
+    full={full}
+    showLineNumbers
+  >
     {children}
   </StyledHighlighter>
 )

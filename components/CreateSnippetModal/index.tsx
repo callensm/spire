@@ -80,8 +80,8 @@ class CreateSnippetModal extends React.PureComponent<
     this.setState({ selected: repo, currentStep: 2 })
   }
 
-  enableSubmit = () => {
-    this.setState({ disableSubmit: false })
+  enableSubmit = (b: boolean) => {
+    this.setState({ disableSubmit: !b })
   }
 
   renderStep = (step: number): React.ReactNode => {
@@ -130,7 +130,7 @@ class CreateSnippetModal extends React.PureComponent<
             username={this.props.username}
             repoName={this.state.selected.name}
             source={this.state.source}
-            onHasContent={this.enableSubmit}
+            hasDescription={this.enableSubmit}
           />
         )
       }
@@ -146,6 +146,7 @@ class CreateSnippetModal extends React.PureComponent<
         cancelText="Discard"
         destroyOnClose={true}
         closable={false}
+        maskClosable={false}
         onCancel={this.onCancel}
         onOk={this.handleSubmit}
         okButtonProps={{ disabled: this.state.disableSubmit }}

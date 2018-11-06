@@ -2,7 +2,7 @@ import * as React from 'react'
 import { Input } from 'antd'
 
 interface IDescriptionInputProps {
-  onHasContent: () => void
+  hasDescription: (b: boolean) => void
 }
 
 interface IDescriptionInputState {
@@ -15,8 +15,10 @@ class DescriptionInput extends React.PureComponent<IDescriptionInputProps, IDesc
   }
 
   handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    this.setState({ value: e.target.value })
-    if (this.state.value.length > 10) this.props.onHasContent()
+    this.setState({ value: e.target.value }, () => {
+      if (this.state.value.length >= 10) this.props.hasDescription(true)
+      else this.props.hasDescription(false)
+    })
   }
 
   render() {
@@ -31,7 +33,7 @@ class DescriptionInput extends React.PureComponent<IDescriptionInputProps, IDesc
         />
         <div style={{ width: '100%' }}>
           <span style={{ float: 'right', color: 'rgba(0, 0, 0, 0.45)' }}>
-            Characters Left: {250 - this.state.value.length}
+            Characters Left (10 minimum): {250 - this.state.value.length}
           </span>
         </div>
       </div>

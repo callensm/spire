@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Button, Icon, Tag } from 'antd'
-import colors from '../../lib/languageColors'
+import langs from '../../lib/languageData'
 import Card, { Meta } from '../Common/Card'
 import Code from '../Common/Code'
 
@@ -17,7 +17,7 @@ export const GistPreview: React.SFC<IGistPreviewProps> = props => (
     <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
       <Meta
         title={props.fileName}
-        description={<Tag color={colors[props.language].color}>{props.language}</Tag>}
+        description={<Tag color={langs[props.language].color}>{props.language}</Tag>}
       />
       <Button onClick={props.onSelect}>
         Select <Icon type="caret-right" />
