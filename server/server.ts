@@ -12,7 +12,6 @@ server.use(cookieParser())
 server.use(express.json())
 server.use(express.urlencoded({ extended: false }))
 
-server.use('/api/tag', routes.TagRouter)
 server.use('/api/user', routes.UserRouter)
 server.use('/api/snippet', routes.SnippetRouter)
 

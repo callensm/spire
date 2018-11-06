@@ -1,10 +1,5 @@
 import { Document } from 'mongoose'
 
-export interface ITag extends Document {
-  text: string
-  color: string
-}
-
 export interface IUser extends Document {
   createdAt: Date | string
   username?: string
@@ -23,7 +18,6 @@ export interface ISnippet extends Document {
   language: TCodeLanguage
   favorited: boolean
   numberOfFavorites: number
-  tags: ITag[]
 }
 
 export type TCodeLanguage =

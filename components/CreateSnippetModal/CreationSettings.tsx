@@ -103,10 +103,13 @@ class CreationSettings extends React.Component<ICreationSettingsProps, ICreation
           onChange={this.handleSliderChange}
           min={1}
           max={this.state.fullCode.split('\n').length - 1}
-          marks={{
-            0: '1',
-            [this.state.fullCode.split('\n').length - 1]: this.state.fullCode.split('\n').length - 1
-          }}
+          marks={
+            this.state.fullCode !== '' && {
+              0: '1',
+              [this.state.fullCode.split('\n').length - 1]:
+                this.state.fullCode.split('\n').length - 1
+            }
+          }
           range
         />
         <Code
