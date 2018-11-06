@@ -10,6 +10,7 @@ interface ICreationSettingsProps {
   source: 'gist' | 'repo'
   username: string
   repoName: string
+  gistCode?: string
   hasDescription: (b: boolean) => void
 }
 
@@ -38,6 +39,10 @@ class CreationSettings extends React.Component<ICreationSettingsProps, ICreation
     fullCode: '',
     language: '',
     sliderValue: [1, 200] as [number, number]
+  }
+
+  componentDidMount() {
+    if (this.props.gistCode) this.setState({ fullCode: this.props.gistCode })
   }
 
   setFullCode = debounce(async () => {
@@ -83,33 +88,33 @@ class CreationSettings extends React.Component<ICreationSettingsProps, ICreation
   render() {
     return (
       <div>
-        {this.props.source === 'repo' ? (
-          <>
-            <Input
-              value={this.state.filePath}
-              placeholder="path/to/file.x"
-              onChange={this.handleFileChange}
-              addonBefore="repositoryRoot/"
-              suffix={<Icon type="file-text" />}
-            />
-            <Slider
-              disabled={!fileRegex.test(this.state.filePath)}
-              value={this.state.sliderValue}
-              onChange={this.handleSliderChange}
-              min={1}
-              max={this.state.fullCode.split('\n').length - 1}
-              range
-            />
-            <Code
-              startingLineNumber={this.state.sliderValue[0]}
-              language={this.state.language.toLowerCase()}
-            >
-              {this.state.selectedCode}
-            </Code>
-          </>
-        ) : (
-          <span>test</span>
+        {this.props.source === 'repo' && (
+          <Input
+            value={this.state.filePath}
+            placeholder="path/to/file.x"
+            onChange={this.handleFileChange}
+            addonBefore="repositoryRoot/"
+            suffix={<Icon type="file-text" />}
+          />
         )}
+        <Slider
+          disabled={!fileRegex.test(this.state.filePath) && !this.props.gistCode}
+          value={this.state.sliderValue}
+          onChange={this.handleSliderChange}
+          min={1}
+          max={this.state.fullCode.split('\n').length - 1}
+          marks={{
+            0: '1',
+            [this.state.fullCode.split('\n').length - 1]: this.state.fullCode.split('\n').length - 1
+          }}
+          range
+        />
+        <Code
+          startingLineNumber={this.state.sliderValue[0]}
+          language={this.state.language.toLowerCase()}
+        >
+          {this.state.selectedCode}
+        </Code>
         <DescriptionInput hasDescription={this.props.hasDescription} />
       </div>
     )

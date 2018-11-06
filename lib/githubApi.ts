@@ -51,8 +51,12 @@ class GitHubAPI {
   }
 
   async getRepoFileContent(username: string, repo: string, path: string): Promise<string> {
-    const { data } = await axios.get(this.route(`/repos/${username}/${repo}/contents/${path}`))
-    return Buffer.from(data.content, 'base64').toString()
+    try {
+      const { data } = await axios.get(this.route(`/repos/${username}/${repo}/contents/${path}`))
+      return Buffer.from(data.content, 'base64').toString()
+    } catch (err) {
+      return err
+    }
   }
 
   private route = (r: string): string => `${GitHubAPI.root}${r}${GitHubAPI.auth}`

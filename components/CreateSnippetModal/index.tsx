@@ -130,6 +130,7 @@ class CreateSnippetModal extends React.PureComponent<
             username={this.props.username}
             repoName={this.state.selected.name}
             source={this.state.source}
+            gistCode={this.state.source === 'gist' ? this.state.gists[1].content : null}
             hasDescription={this.enableSubmit}
           />
         )
