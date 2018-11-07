@@ -1,7 +1,8 @@
 import * as React from 'react'
-import { Modal } from 'antd'
+import { Modal, notification } from 'antd'
 import styled from 'styled-components'
 import { observer, inject } from 'mobx-react'
+import axios from 'axios'
 import GitHubAPI, { IRepoDetails, IGistDetails } from '../../lib/githubApi'
 import StepTracker from './StepTracker'
 import SourceCardList from './SourceCardList'
@@ -26,7 +27,7 @@ interface ICreateSnippetModalProps {
   username: string
   gistIDs: string[]
   repos: IRepoDetails[]
-  store: CreationStore
+  store?: CreationStore
   onClose: () => void
 }
 
@@ -75,7 +76,41 @@ class CreateSnippetModal extends React.Component<
   }
 
   handleSubmit = () => {
-    alert(JSON.stringify(this.props.store))
+    // axios
+    //   .post('/api/snippet', {
+    //     author: this.props.username,
+    //     description: this.props.store.description,
+    //     code: this.props.store.code,
+    //     language: this.props.store.language,
+    //     origin: this.props.store.origin
+    //   })
+    //   .then(_snippet => {
+    //     notification.success({
+    //       message: 'New Snippet Created!',
+    //       description: JSON.stringify(this.props.store)
+    //     })
+    //   })
+    //   .catch(console.error)
+
+    notification.success({
+      message: 'New Snippet Created!',
+      description: (
+        <>
+          <p style={{ marginBottom: 0, paddingBottom: 0 }}>
+            <b>Origin:</b>{' '}
+            <a href={this.props.store.origin} target="_blank">
+              {this.props.store.source === 'gist' ? 'Gist' : 'Repository File'}
+            </a>
+          </p>
+          <p>
+            <b>Description:</b> {this.props.store.description}
+          </p>
+        </>
+      )
+    })
+
+    this.props.store.reset()
+    this.props.onClose()
   }
 
   handleSelectGist = gist => {
@@ -128,10 +163,16 @@ class CreateSnippetModal extends React.Component<
 
       case 2: {
         return (
+          // TODO: Fix gist source click event and data passing
           <CreationSettings
             username={this.props.username}
-            repoName={this.state.selected.name}
-            gistCode={this.props.store.source === 'gist' ? this.state.gists[1].content : null}
+            name={
+              this.props.store.source === 'gist'
+                ? this.state.selected.filename
+                : this.state.selected.name
+            }
+            gistID={this.props.store.source === 'gist' ? this.state.selected.id : null}
+            gistCode={this.props.store.source === 'gist' ? this.state.selected.content : null}
             store={this.props.store}
           />
         )

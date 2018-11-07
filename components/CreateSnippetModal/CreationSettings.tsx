@@ -10,7 +10,8 @@ import { observer } from 'mobx-react'
 
 interface ICreationSettingsProps {
   username: string
-  repoName: string
+  name: string
+  gistID?: string
   gistCode?: string
   store: CreationStore
 }
@@ -42,18 +43,24 @@ class CreationSettings extends React.Component<ICreationSettingsProps, ICreation
   }
 
   componentDidMount() {
-    if (this.props.gistCode)
+    if (this.props.gistCode) {
       this.setState({
         fullCode: this.props.gistCode,
         lines: this.props.gistCode.split('\n').length
       })
+      this.props.store.setLanguage(this.determineLanguage(this.props.name))
+    }
+  }
+
+  determineLanguage = (filename: string): string => {
+    const ext = filename.substr(this.props.name.lastIndexOf('.'))
+    const lang = Object.values(langs).filter(ex => ex.extensions.includes(ext))[0] || null
+    return lang.codemirror_mode || lang.ace_mode || ''
   }
 
   setFullCode = debounce(async () => {
-    const { username, repoName } = this.props
-    const content = await GitHubAPI.getRepoFileContent(username, repoName, this.state.filePath)
-    const ext = this.state.filePath.substr(this.state.filePath.lastIndexOf('.'))
-    const lang = Object.values(langs).filter(ex => ex.extensions.includes(ext))[0] || null
+    const { username, name } = this.props
+    const content = await GitHubAPI.getRepoFileContent(username, name, this.state.filePath)
 
     this.setState(
       {
@@ -62,7 +69,7 @@ class CreationSettings extends React.Component<ICreationSettingsProps, ICreation
       },
       () => {
         this.props.store.setCode(content)
-        this.props.store.setLanguage(lang.codemirror_mode || lang.ace_mode || '')
+        this.props.store.setLanguage(this.determineLanguage(this.state.filePath))
       }
     )
   }, 250)
@@ -82,6 +89,22 @@ class CreationSettings extends React.Component<ICreationSettingsProps, ICreation
   handleSliderChange = (value: SliderValue) => {
     this.setState({ sliderValue: value }, () => {
       this.handleLineNumberChange(this.state.sliderValue)
+
+      if (this.props.store.source === 'repo') {
+        this.props.store.setOrigin(
+          `https://github.com/${this.props.username}/${this.props.name}/blob/master/${
+            this.state.filePath
+          }#L${this.state.sliderValue[0]}-L${this.state.sliderValue[1]}`
+        )
+      } else {
+        this.props.store.setOrigin(
+          `https://gist.github.com/${this.props.username}/${
+            this.props.gistID
+          }#file-${this.props.name.replace('.', '-')}#L${this.state.sliderValue[0]}-L${
+            this.state.sliderValue[1]
+          }`
+        )
+      }
     })
   }
 

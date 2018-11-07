@@ -8,7 +8,7 @@ export const SnippetSchema: Schema = new Schema({
     default: new Date()
   },
   author: {
-    type: Schema.Types.ObjectId,
+    type: String,
     required: true
   },
   description: {
@@ -23,6 +23,10 @@ export const SnippetSchema: Schema = new Schema({
     type: String,
     required: true
   },
+  origin: {
+    type: String,
+    required: true
+  },
   numberOfFavorites: {
     type: Number,
     default: 0
@@ -31,7 +35,7 @@ export const SnippetSchema: Schema = new Schema({
 
 SnippetSchema.post('save', (err, doc, next) => {
   if (err) next(err)
-  User.updateOne({ _id: (doc as ISnippet).author }, { $push: doc._id })
+  User.updateOne({ username: (doc as ISnippet).author }, { $push: doc._id })
 })
 
 const Snippet: Model<ISnippet> = model<ISnippet>('Snippet', SnippetSchema)

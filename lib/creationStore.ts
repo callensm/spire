@@ -45,6 +45,11 @@ export class CreationStore {
   }
 
   @action.bound
+  appendOrigin(str: string) {
+    this.origin += str
+  }
+
+  @action.bound
   setDescription(desc: string) {
     this.description = desc
   }
