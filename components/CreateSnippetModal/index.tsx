@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { Modal } from 'antd'
 import styled from 'styled-components'
+import { observer, inject } from 'mobx-react'
 import GitHubAPI, { IRepoDetails, IGistDetails } from '../../lib/githubApi'
 import StepTracker from './StepTracker'
 import SourceCardList from './SourceCardList'
@@ -8,6 +9,7 @@ import SkeletonCards from './SkeletonCards'
 import { GistPreviewList } from './GistPreview'
 import { RepoPreviewList } from './RepoPreview'
 import CreationSettings from './CreationSettings'
+import { CreationStore } from '../../lib/creationStore'
 
 const ModalContainer = styled.div`
   display: flex;
@@ -24,25 +26,24 @@ interface ICreateSnippetModalProps {
   username: string
   gistIDs: string[]
   repos: IRepoDetails[]
+  store: CreationStore
   onClose: () => void
 }
 
 interface ICreateSnippetModalState {
-  disableSubmit: boolean
-  source: 'gist' | 'repo' | null
   currentStep: number
   gists: any[]
   loading: boolean
   selected: any
 }
 
-class CreateSnippetModal extends React.PureComponent<
+@inject('store')
+@observer
+class CreateSnippetModal extends React.Component<
   ICreateSnippetModalProps,
   ICreateSnippetModalState
 > {
   state = {
-    disableSubmit: true,
-    source: null,
     currentStep: 0,
     gists: [],
     loading: false,
@@ -50,26 +51,31 @@ class CreateSnippetModal extends React.PureComponent<
   }
 
   chooseSource = async (source: 'gist' | 'repo') => {
-    this.setState({ source, currentStep: 1, loading: true })
-    const { gistIDs } = this.props
+    this.setState({ currentStep: 1 })
+    this.props.store.setSource(source)
 
+    const { gistIDs } = this.props
     if (source === 'gist') {
+      this.setState({ loading: true })
+
       const details: Promise<IGistDetails>[] = gistIDs.map(i => GitHubAPI.getGistDetails(i))
       const gists: IGistDetails[] = await Promise.all(details)
       const availableGists = gists
         .filter(g => Object.keys(g.files).length === 1)
         .map(g => ({ ...Object.values(g.files)[0], id: g.id }))
+
       this.setState({ gists: availableGists, loading: false })
     }
   }
 
   onCancel = () => {
     this.props.onClose()
-    this.setState({ disableSubmit: true, source: null, currentStep: 0, loading: false, gists: [] })
+    this.props.store.reset()
+    this.setState({ currentStep: 0, loading: false, gists: [] })
   }
 
   handleSubmit = () => {
-    alert('submit')
+    alert(JSON.stringify(this.props.store))
   }
 
   handleSelectGist = gist => {
@@ -78,10 +84,6 @@ class CreateSnippetModal extends React.PureComponent<
 
   handleSelectRepo = repo => {
     this.setState({ selected: repo, currentStep: 2 })
-  }
-
-  enableSubmit = (b: boolean) => {
-    this.setState({ disableSubmit: !b })
   }
 
   renderStep = (step: number): React.ReactNode => {
@@ -109,7 +111,7 @@ class CreateSnippetModal extends React.PureComponent<
       }
 
       case 1: {
-        if (this.state.source === 'gist') {
+        if (this.props.store.source === 'gist') {
           return this.state.loading ? (
             <SkeletonCards amount={this.props.gistIDs.length} width="35em" />
           ) : (
@@ -129,9 +131,8 @@ class CreateSnippetModal extends React.PureComponent<
           <CreationSettings
             username={this.props.username}
             repoName={this.state.selected.name}
-            source={this.state.source}
-            gistCode={this.state.source === 'gist' ? this.state.gists[1].content : null}
-            hasDescription={this.enableSubmit}
+            gistCode={this.props.store.source === 'gist' ? this.state.gists[1].content : null}
+            store={this.props.store}
           />
         )
       }
@@ -150,7 +151,7 @@ class CreateSnippetModal extends React.PureComponent<
         maskClosable={false}
         onCancel={this.onCancel}
         onOk={this.handleSubmit}
-        okButtonProps={{ disabled: this.state.disableSubmit }}
+        okButtonProps={{ disabled: this.props.store.description.length < 10 }}
       >
         <ModalContainer>
           <StepTracker current={this.state.currentStep} />

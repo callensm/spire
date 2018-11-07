@@ -1,44 +1,27 @@
 import * as React from 'react'
 import { Input } from 'antd'
+import { observer } from 'mobx-react'
 
 interface IDescriptionInputProps {
-  hasDescription: (b: boolean) => void
-}
-
-interface IDescriptionInputState {
   value: string
+  onChange: (val: string) => void
 }
 
-class DescriptionInput extends React.PureComponent<IDescriptionInputProps, IDescriptionInputState> {
-  state = {
-    value: ''
-  }
-
-  handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    this.setState({ value: e.target.value }, () => {
-      if (this.state.value.length >= 10) this.props.hasDescription(true)
-      else this.props.hasDescription(false)
-    })
-  }
-
-  render() {
-    return (
-      <div style={{ display: 'flex', flexDirection: 'column' }}>
-        <Input.TextArea
-          autosize
-          value={this.state.value}
-          placeholder="Describe your new snippet..."
-          maxLength={250}
-          onChange={this.handleChange}
-        />
-        <div style={{ width: '100%' }}>
-          <span style={{ float: 'right', color: 'rgba(0, 0, 0, 0.45)' }}>
-            Characters Left (10 minimum): {250 - this.state.value.length}
-          </span>
-        </div>
-      </div>
-    )
-  }
-}
+const DescriptionInput: React.SFC<IDescriptionInputProps> = observer(props => (
+  <div style={{ display: 'flex', flexDirection: 'column' }}>
+    <Input.TextArea
+      autosize
+      value={props.value}
+      placeholder="Describe your new snippet..."
+      maxLength={250}
+      onChange={e => props.onChange(e.target.value)}
+    />
+    <div style={{ width: '100%' }}>
+      <span style={{ float: 'right', color: 'rgba(0, 0, 0, 0.45)' }}>
+        Characters Left (10 minimum): {250 - props.value.length}
+      </span>
+    </div>
+  </div>
+))
 
 export default DescriptionInput

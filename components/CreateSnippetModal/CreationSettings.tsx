@@ -5,20 +5,20 @@ import DescriptionInput from './DescriptionInput'
 import Code from '../Common/Code'
 import GitHubAPI from '../../lib/githubApi'
 import langs from '../../lib/languageData'
+import { CreationStore } from '../../lib/creationStore'
+import { observer } from 'mobx-react'
 
 interface ICreationSettingsProps {
-  source: 'gist' | 'repo'
   username: string
   repoName: string
   gistCode?: string
-  hasDescription: (b: boolean) => void
+  store: CreationStore
 }
 
 interface ICreationSettingsState {
   filePath: string
-  selectedCode: string
   fullCode: string
-  language: string
+  lines: number
   sliderValue: SliderValue
 }
 
@@ -32,17 +32,21 @@ const debounce = (fn, ms = 0) => {
 
 const fileRegex: RegExp = /\..{1,}$/
 
+@observer
 class CreationSettings extends React.Component<ICreationSettingsProps, ICreationSettingsState> {
   state = {
     filePath: '',
-    selectedCode: '',
     fullCode: '',
-    language: '',
+    lines: 1,
     sliderValue: [1, 200] as [number, number]
   }
 
   componentDidMount() {
-    if (this.props.gistCode) this.setState({ fullCode: this.props.gistCode })
+    if (this.props.gistCode)
+      this.setState({
+        fullCode: this.props.gistCode,
+        lines: this.props.gistCode.split('\n').length
+      })
   }
 
   setFullCode = debounce(async () => {
@@ -50,11 +54,17 @@ class CreationSettings extends React.Component<ICreationSettingsProps, ICreation
     const content = await GitHubAPI.getRepoFileContent(username, repoName, this.state.filePath)
     const ext = this.state.filePath.substr(this.state.filePath.lastIndexOf('.'))
     const lang = Object.values(langs).filter(ex => ex.extensions.includes(ext))[0] || null
-    this.setState({
-      fullCode: content,
-      selectedCode: content,
-      language: lang.codemirror_mode || lang.ace_mode || ''
-    })
+
+    this.setState(
+      {
+        fullCode: content,
+        lines: content.split('\n').length
+      },
+      () => {
+        this.props.store.setCode(content)
+        this.props.store.setLanguage(lang.codemirror_mode || lang.ace_mode || '')
+      }
+    )
   }, 250)
 
   normalize = (line: string, amt: number): string => {
@@ -80,15 +90,13 @@ class CreationSettings extends React.Component<ICreationSettingsProps, ICreation
     const lines = this.state.fullCode.split('\n').slice(start - 1, end)
     const toRemove: number = lines[0].search(/[^\t]/g)
     const code: string = lines.map(line => this.normalize(line, toRemove)).join('\n')
-    this.setState({
-      selectedCode: code
-    })
+    this.props.store.setCode(code)
   }
 
   render() {
     return (
       <div>
-        {this.props.source === 'repo' && (
+        {this.props.store.source === 'repo' && (
           <Input
             value={this.state.filePath}
             placeholder="path/to/file.x"
@@ -102,23 +110,27 @@ class CreationSettings extends React.Component<ICreationSettingsProps, ICreation
           value={this.state.sliderValue}
           onChange={this.handleSliderChange}
           min={1}
-          max={this.state.fullCode.split('\n').length - 1}
+          max={this.state.lines - 1}
           marks={
-            this.state.fullCode !== '' && {
-              0: '1',
-              [this.state.fullCode.split('\n').length - 1]:
-                this.state.fullCode.split('\n').length - 1
-            }
+            this.state.fullCode !== ''
+              ? {
+                  0: 1,
+                  [this.state.lines - 1]: this.state.lines - 1
+                }
+              : {}
           }
           range
         />
         <Code
           startingLineNumber={this.state.sliderValue[0]}
-          language={this.state.language.toLowerCase()}
+          language={this.props.store.language.toLowerCase()}
         >
-          {this.state.selectedCode}
+          {this.props.store.code}
         </Code>
-        <DescriptionInput hasDescription={this.props.hasDescription} />
+        <DescriptionInput
+          value={this.props.store.description}
+          onChange={this.props.store.setDescription}
+        />
       </div>
     )
   }

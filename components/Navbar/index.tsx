@@ -1,9 +1,11 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { Layout, Button, Modal } from 'antd'
+import { Provider } from 'mobx-react'
 import GitHubAPI, { IRepoDetails } from '../../lib/githubApi'
 import AvatarMenu from './AvatarMenu'
 import CreateSnippetModal from '../CreateSnippetModal'
+import CreationStore from '../../lib/creationStore'
 
 const { Header } = Layout
 
@@ -76,13 +78,15 @@ class Navbar extends React.Component<INavbarProps, INavbarState> {
             <Button icon="github">Login with GitHub</Button>
           )}
         </SubMenu>
-        <CreateSnippetModal
-          username={this.props.user.login}
-          visible={this.state.modal}
-          gistIDs={this.state.gistIDs}
-          repos={this.state.repos}
-          onClose={this.closeModal}
-        />
+        <Provider store={CreationStore}>
+          <CreateSnippetModal
+            username={this.props.user.login}
+            visible={this.state.modal}
+            gistIDs={this.state.gistIDs}
+            repos={this.state.repos}
+            onClose={this.closeModal}
+          />
+        </Provider>
       </Bar>
     )
   }

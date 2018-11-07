@@ -1,6 +1,5 @@
 import { Schema, Model, model } from 'mongoose'
 import { ISnippet } from '../types'
-import { TagSchema } from './tag'
 import User from './user'
 
 export const SnippetSchema: Schema = new Schema({
@@ -27,11 +26,6 @@ export const SnippetSchema: Schema = new Schema({
   numberOfFavorites: {
     type: Number,
     default: 0
-  },
-  tags: {
-    type: [Schema.Types.ObjectId],
-    required: true,
-    default: []
   }
 })
 
@@ -40,5 +34,5 @@ SnippetSchema.post('save', (err, doc, next) => {
   User.updateOne({ _id: (doc as ISnippet).author }, { $push: doc._id })
 })
 
-const Snippet: Model<ISnippet> = model<ISnippet>('Snippet', TagSchema)
+const Snippet: Model<ISnippet> = model<ISnippet>('Snippet', SnippetSchema)
 export default Snippet
