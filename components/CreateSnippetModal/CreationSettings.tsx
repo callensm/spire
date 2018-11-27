@@ -53,8 +53,8 @@ class CreationSettings extends React.Component<ICreationSettingsProps, ICreation
   }
 
   determineLanguage = (filename: string): string => {
-    const ext = filename.substr(this.props.name.lastIndexOf('.'))
-    const lang = Object.values(langs).filter(ex => ex.extensions.includes(ext))[0] || null
+    const ext = filename.substr(filename.lastIndexOf('.'))
+    const lang = Object.values(langs).filter(ex => ex.extensions.includes(ext))[0]
     return lang.codemirror_mode || lang.ace_mode || ''
   }
 
@@ -62,16 +62,12 @@ class CreationSettings extends React.Component<ICreationSettingsProps, ICreation
     const { username, name } = this.props
     const content = await GitHubAPI.getRepoFileContent(username, name, this.state.filePath)
 
-    this.setState(
-      {
-        fullCode: content,
-        lines: content.split('\n').length
-      },
-      () => {
-        this.props.store.setCode(content)
-        this.props.store.setLanguage(this.determineLanguage(this.state.filePath))
-      }
-    )
+    this.props.store.setCode(content)
+    this.props.store.setLanguage(this.determineLanguage(this.state.filePath))
+    this.setState({
+      fullCode: content,
+      lines: content.split('\n').length
+    })
   }, 250)
 
   normalize = (line: string, amt: number): string => {

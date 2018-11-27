@@ -75,42 +75,36 @@ class CreateSnippetModal extends React.Component<
     this.setState({ currentStep: 0, loading: false, gists: [] })
   }
 
-  handleSubmit = () => {
-    // axios
-    //   .post('/api/snippet', {
-    //     author: this.props.username,
-    //     description: this.props.store.description,
-    //     code: this.props.store.code,
-    //     language: this.props.store.language,
-    //     origin: this.props.store.origin
-    //   })
-    //   .then(_snippet => {
-    //     notification.success({
-    //       message: 'New Snippet Created!',
-    //       description: JSON.stringify(this.props.store)
-    //     })
-    //   })
-    //   .catch(console.error)
-
-    notification.success({
-      message: 'New Snippet Created!',
-      description: (
-        <>
-          <p style={{ marginBottom: 0, paddingBottom: 0 }}>
-            <b>Origin:</b>{' '}
-            <a href={this.props.store.origin} target="_blank">
-              {this.props.store.source === 'gist' ? 'Gist' : 'Repository File'}
-            </a>
-          </p>
-          <p>
-            <b>Description:</b> {this.props.store.description}
-          </p>
-        </>
-      )
-    })
-
-    this.props.store.reset()
-    this.props.onClose()
+  handleSubmit = async () => {
+    try {
+      await axios.post('/api/snippet', {
+        author: this.props.username,
+        description: this.props.store.description,
+        code: this.props.store.code,
+        language: this.props.store.language,
+        origin: this.props.store.origin
+      })
+      notification.success({
+        message: 'New Snippet Created!',
+        description: (
+          <>
+            <p style={{ marginBottom: 0, paddingBottom: 0 }}>
+              <b>Origin:</b>{' '}
+              <a href={this.props.store.origin} target="_blank">
+                {this.props.store.source === 'gist' ? 'Gist' : 'Repository File'}
+              </a>
+            </p>
+            <p>
+              <b>Description:</b> {this.props.store.description}
+            </p>
+          </>
+        )
+      })
+      this.props.store.reset()
+      this.props.onClose()
+    } catch (err) {
+      console.error(err)
+    }
   }
 
   handleSelectGist = gist => {
